@@ -15,12 +15,21 @@ export default defineComponent({
       required: false
     }
   },
+  methods: {
+    reRender() {
+      this.renderChart(this.chartData, this.chartOptions)
+    }
+   },
+  watch: {
+    chartData() {
+      this.reRender()
+    },
+    chartOptions() {
+      this.reRender()
+    }
+  },
   mounted() {
-    this.renderChart(this.chartData,
-    {
-      responsive: true,
-      ...this.chartOptions
-    })
+    this.reRender()
   }
 })
 </script>

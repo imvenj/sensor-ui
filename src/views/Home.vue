@@ -102,15 +102,20 @@ export default defineComponent({
         return formatDate(latest)
       }),
       timeLabels: computed(() => data.today.map((d: any) => d.tick)),
-      chartOptions: computed(() => {
-        return {
-          element: {
-            point: {
-              hoverRadius: 1
-            }
+      chartOptions: {
+        radius: 0,
+        scales: {
+          y: {
+            display: true,
+            title: {
+              display: true,
+              text: 'Value'
+            },
+            suggestedMin: -10,
+            suggestedMax: 200
           }
         }
-      }),
+      },
       temperatureData: computed(() => {
         const temperatures: any = data.today.map((d: any) => d.temperature)
         return {
@@ -183,6 +188,7 @@ export default defineComponent({
         let average: any = {}
         let currentKey = ''
         const total = []
+        let groupCounter = 0
         for (const t of today) {
           const tick = formatDate(new Date(t.timestamp), true)
           const parts = tick.split(':')
@@ -190,17 +196,24 @@ export default defineComponent({
           const key = `${parts[0]} + ${Math.floor(Number(parts[1]) / 10)}`
           if (!currentKey || currentKey !== key) {
             currentKey = key
-            if (Object.keys(average).length > 0) { total.push(average) }
+            if (Object.keys(average).length > 0) {
+              average = Object.fromEntries(Object.entries(average).map(([k, v]: Array<any>) => {
+                return typeof(v) === 'number' ? [k, v / groupCounter] : [k, v]
+              }))
+              total.push(average)
+            }
             average = t
+            groupCounter = 1
           } else {
             average = {
-              temperature: (average.temperature + t.temperature) / 2,
-              humidity: (average.humidity + t.humidity) / 2,
-              pressure: (average.pressure + t.pressure) / 2,
-              altitude: (average.altitude + t.altitude) / 2,
-              luminocity: (average.luminocity + t.luminocity) / 2,
+              temperature: average.temperature + t.temperature,
+              humidity: average.humidity + t.humidity,
+              pressure: average.pressure + t.pressure,
+              altitude: average.altitude + t.altitude,
+              luminocity: average.luminocity + t.luminocity,
               tick: tickMini
             }
+            groupCounter++
           }
         }
         console.log('total: ', total)
