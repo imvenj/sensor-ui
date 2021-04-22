@@ -192,8 +192,7 @@ export default defineComponent({
         for (const t of today) {
           const tick = formatDate(new Date(t.timestamp), true)
           const parts = tick.split(':')
-          const tickMini = `${parts[0]}:${parts[1]}`
-          const key = `${parts[0]} + ${Math.floor(Number(parts[1]) / 10)}`
+          const key = `${parts[0]}:${Math.floor(Number(parts[1]) / 10)}`
           if (!currentKey || currentKey !== key) {
             currentKey = key
             if (Object.keys(average).length > 0) {
@@ -211,7 +210,7 @@ export default defineComponent({
               pressure: average.pressure + t.pressure,
               altitude: average.altitude + t.altitude,
               luminocity: average.luminocity + t.luminocity,
-              tick: tickMini
+              tick: key + '0'
             }
             groupCounter++
           }
