@@ -16,11 +16,11 @@
       <div id="container">
         <ion-card v-if="current">
           <ion-card-content>
-            <div>气温：{{ current.temperature }} ℃</div>
-            <div>湿度：{{ current.humidity }} %</div>
-            <div>气压：{{ current.pressure }} hPa</div>
-            <div>海拔：{{ current.pressure > 1013.25 && current.altitude > 0 ? '-' : '' }}{{ current.altitude }} M</div>
-            <div>照度：{{ current.luminocity }} lux</div>
+            <div>气温：{{ current.temperature || '...' }} ℃</div>
+            <div>湿度：{{ current.humidity || '...' }} %</div>
+            <div>气压：{{ current.pressure || '...' }} hPa</div>
+            <div>海拔：{{ current.pressure > 1013.25 && current.altitude > 0 ? '-' : '' }}{{ current.altitude || '...' }} M</div>
+            <div>照度：{{ current.luminocity || '...' }} lux</div>
             <div class="updated-at">
               更新于：{{ currentDate }}
             </div>
@@ -30,9 +30,9 @@
           <ion-card-content>
             <apexchart
               width="100%"
-              :options="{...chartOptions, colors: ['#6CB33F'], title: {text: '气温'}}"
+              :options="temperatureOptions"
               :series="temperatureSeries"
-               v-if="today.length > 0"
+               v-if="temperatureSeries.length > 0"
             ></apexchart>
             <div v-else>加载中...</div>
           </ion-card-content>
@@ -41,9 +41,9 @@
           <ion-card-content>
             <apexchart
               width="100%"
-              :options="{...chartOptions, colors: ['#009DDC'], title: {text: '湿度'}}"
+              :options="humidityOptions"
               :series="humiditySeries"
-               v-if="today.length > 0"
+               v-if="humiditySeries.length > 0"
             ></apexchart>
             <div v-else>加载中...</div>
           </ion-card-content>
@@ -52,9 +52,9 @@
           <ion-card-content>
             <apexchart
               width="100%"
-              :options="{...chartOptions, colors: ['#FDBB30'], title: {text: '气压'}}"
+              :options="pressureOptions"
               :series="pressureSeries"
-               v-if="today.length > 0"
+               v-if="pressureSeries.length > 0"
             ></apexchart>
             <div v-else>加载中...</div>
           </ion-card-content>
@@ -63,9 +63,9 @@
           <ion-card-content>
             <apexchart
               width="100%"
-              :options="{...chartOptions, colors: ['#FB89F0'], title: {text: '照度'}}"
+              :options="luminocityOptions"
               :series="luminocitySeries"
-               v-if="today.length > 0"
+               v-if="luminocitySeries.length > 0"
             ></apexchart>
             <div v-else>加载中...</div>
           </ion-card-content>
@@ -93,7 +93,7 @@ import {
 } from '@ionic/vue';
 import { defineComponent, onMounted, computed, toRefs, reactive } from 'vue';
 import { getCurrent, getToday } from '@/api/index'
-import { formatDate } from '@/utils/index'
+import { formatDate, startOfDate } from '@/utils/index'
 
 export default defineComponent({
   name: 'Home',
@@ -108,99 +108,101 @@ export default defineComponent({
     IonButton
   },
   setup() {
-    const data: any = reactive({
-      current: {},
-      today: [],
-      currentDate: computed(() => {
-        const latest: Date = new Date((data.current as any).timestamp)
-        return formatDate(latest)
-      }),
-      timeLabels: computed(() => data.today.map((d: any) => d.tick)),
-      chartOptions: {
-        stroke: {
-          curve: 'smooth',
-          width: 2
+    const chartOptions = {
+      stroke: {
+        curve: 'smooth',
+        width: 2
+      },
+      dataLabels: {
+        enabled: false
+      },
+      chart: {
+        height: 40,
+        type: 'area',
+        toolbar: {
+          show: false
         },
-        dataLabels: {
-          enabled: false
-        },
-        chart: {
-          height: 40,
-          type: 'area',
-          toolbar: {
-            show: false
+        animations: {
+          enabled: true,
+          easing: 'easeinout',
+          speed: 1500,
+          animateGradually: {
+              enabled: false,
+              delay: 100
           },
-          animations: {
-            enabled: true,
-            easing: 'easeinout',
-            speed: 1500,
-            animateGradually: {
-                enabled: false,
-                delay: 100
-            },
-            dynamicAnimation: {
-                enabled: false,
-                speed: 150
-            }
+          dynamicAnimation: {
+              enabled: false,
+              speed: 150
           }
-        },
-        fill: {
-          type: "gradient",
-          gradient: {
-            shadeIntensity: 1,
-            opacityFrom: 0.7,
-            opacityTo: 0.9,
-            stops: [0, 90, 100]
-          }
-        },
-        xaxis: {
-          categories: computed(() => data.today.map((d: any) => d.tick)),
-          tickAmount: 10,
-        },
-        yaxis: {
-          decimalsInFloat: 1
-        },
-        annotations: {
-          xaxis: [
-            {
-              x: '00:00',
-              borderColor: '#CC0000'
-            }
-          ]
         }
       },
-      temperatureSeries: computed(() => {
-        const temperatures: any = data.today.map((d: any) => d.temperature)
-        return [{
-          name: '气温',
-          type: 'line',
-          data: temperatures
-        }]
+      fill: {
+        type: "gradient",
+        gradient: {
+          shadeIntensity: 1,
+          opacityFrom: 0.7,
+          opacityTo: 0.9,
+          stops: [0, 90, 100]
+        }
+      },
+      xaxis: {
+        type: 'datetime',
+        tickAmount: 10,
+        labels: {
+          datetimeUTC: false
+        },
+        format: 'HH:mm'
+      },
+      yaxis: {
+        decimalsInFloat: 1
+      },
+      annotations: {
+        xaxis: [
+          {
+            x: startOfDate(new Date()).getTime(),
+            borderColor: '#CC0000'
+          }
+        ]
+      },
+      tooltip: {
+        x: {
+          format: 'HH:mm'
+        }
+      }
+    }
+    const data: any = reactive({
+      current: {},
+      currentDate: computed(() => {
+        const ts = (data.current as any).timestamp
+        if (!ts) { return '...' }
+        const latest: Date = new Date(ts)
+        return formatDate(latest)
       }),
-      humiditySeries: computed(() => {
-        const humidities: any = data.today.map((d: any) => d.humidity)
-        return [{
-          name: '气温',
-          type: 'line',
-          data: humidities
-        }]
-      }),
-      pressureSeries: computed(() => {
-        const pressures: any = data.today.map((d: any) => d.pressure)
-        return [{
-          name: '气温',
-          type: 'line',
-          data: pressures
-        }]
-      }),
-      luminocitySeries: computed(() => {
-        const luminocities: any = data.today.map((d: any) => d.luminocity)
-        return [{
-          name: '气温',
-          type: 'line',
-          data: luminocities
-        }]
-      })
+      timeLabels: [],
+      temperatureSeries: [],
+      temperatureOptions: {
+        ... chartOptions,
+        colors: ['#6CB33F'],
+        title: {text: '气温'}
+      },
+      humiditySeries: [],
+      humidityOptions: {
+        ... chartOptions,
+        colors: ['#009DDC'],
+        title: {text: '湿度'}
+      },
+      pressureSeries: [],
+      pressureOptions: {
+        ... chartOptions,
+        colors: ['#FDBB30'],
+        title: {text: '气压'}
+      },
+      luminocitySeries: [],
+      luminocityOptions: {
+        ... chartOptions,
+        colors: ['#FB89F0'],
+        title: {text: '照度'}
+      }
     })
 
     const fetchCurrent = async () => {
@@ -219,14 +221,16 @@ export default defineComponent({
         const total = []
         let groupCounter = 0
         for (const t of today) {
-          const tick = formatDate(new Date(t.timestamp), true)
-          const parts = tick.split(':')
-          const key = `${parts[0]}:${Math.floor(Number(parts[1]) / 10)}`
+          const tick = formatDate(new Date(t.timestamp), false)
+          const parts = tick.split(/[-: ]/)
+          const minute = Math.floor(Number(parts[4]) / 10) * 10
+          const averageTimestamp = new Date(Number(parts[0]), Number(parts[1]), Number(parts[2]), Number(parts[3]), minute, 0).valueOf()
+          const key = `${parts[3]}:${minute}`
           if (!currentKey || currentKey !== key) {
             currentKey = key
             if (Object.keys(average).length > 0) {
               average = Object.fromEntries(Object.entries(average).map(([k, v]: Array<any>) => {
-                return typeof(v) === 'number' ? [k, v / groupCounter] : [k, v]
+                return k !== 'timestamp' ? [k, v / groupCounter] : [k, v]
               }))
               total.push(average)
             }
@@ -239,13 +243,33 @@ export default defineComponent({
               pressure: average.pressure + t.pressure,
               altitude: average.altitude + t.altitude,
               luminocity: average.luminocity + t.luminocity,
-              tick: key + '0'
+              timestamp: averageTimestamp
             }
             groupCounter++
           }
         }
-        console.log('total: ', total)
-        data.today = total
+
+        data.timeLabels = total.map((d: any) => d.tick)
+        const temperatures: any = total.map((d: any) => [d.timestamp, d.temperature])
+        data.temperatureSeries =  [{
+          name: '气温',
+          data: temperatures
+        }]
+        const humidities: any = total.map((d: any) => [d.timestamp, d.humidity])
+        data.humiditySeries =  [{
+          name: '湿度',
+          data: humidities
+        }]
+        const pressures: any = total.map((d: any) => [d.timestamp, d.pressure])
+        data.pressureSeries =  [{
+          name: '气压',
+          data: pressures
+        }]
+        const luminicities: any = total.map((d: any) => [d.timestamp, d.luminocity])
+        data.luminocitySeries =  [{
+          name: '照度',
+          data: luminicities
+        }]
       } catch (error) {
         console.log(error)
       }
