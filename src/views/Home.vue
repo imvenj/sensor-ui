@@ -19,7 +19,7 @@
             <div>气温：{{ current.temperature }} ℃</div>
             <div>湿度：{{ current.humidity }} %</div>
             <div>气压：{{ current.pressure }} hPa</div>
-            <div>海拔：{{ current.altitude }} M</div>
+            <div>海拔：{{ current.pressure > 1013.25 && current.altitude > 0 ? '-' : '' }}{{ current.altitude }} M</div>
             <div>照度：{{ current.luminocity }} lux</div>
             <div class="updated-at">
               更新于：{{ currentDate }}

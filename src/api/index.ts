@@ -12,7 +12,7 @@ export const getCurrent = async() => {
 }
 
 export const getToday = async() => {
-  const resp = await fetch(API_BASE + '/today')
+  const resp = await fetch(API_BASE + '/lastDay')
   if (resp.status >= 200 && resp.status < 300) {
     return resp.json()
   } else {
