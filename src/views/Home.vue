@@ -28,25 +28,45 @@
         </ion-card>
         <ion-card>
           <ion-card-content>
-            <line-chart :chartData="temperatureData" :chartOptions="chartOptions" v-if="today.length > 0"></line-chart>
+            <apexchart
+              width="100%"
+              :options="{...chartOptions, colors: ['#6CB33F'], title: {text: '气温'}}"
+              :series="temperatureSeries"
+               v-if="today.length > 0"
+            ></apexchart>
             <div v-else>加载中...</div>
           </ion-card-content>
         </ion-card>
         <ion-card>
           <ion-card-content>
-            <line-chart :chartData="humidityData" :chartOptions="chartOptions" v-if="today.length > 0"></line-chart>
+            <apexchart
+              width="100%"
+              :options="{...chartOptions, colors: ['#009DDC'], title: {text: '湿度'}}"
+              :series="humiditySeries"
+               v-if="today.length > 0"
+            ></apexchart>
             <div v-else>加载中...</div>
           </ion-card-content>
         </ion-card>
         <ion-card>
           <ion-card-content>
-            <line-chart :chartData="pressureData" :chartOptions="chartOptions" v-if="today.length > 0"></line-chart>
+            <apexchart
+              width="100%"
+              :options="{...chartOptions, colors: ['#FDBB30'], title: {text: '气压'}}"
+              :series="pressureSeries"
+               v-if="today.length > 0"
+            ></apexchart>
             <div v-else>加载中...</div>
           </ion-card-content>
         </ion-card>
         <ion-card>
           <ion-card-content>
-            <line-chart :chartData="luminocityData" :chartOptions="chartOptions" v-if="today.length > 0"></line-chart>
+            <apexchart
+              width="100%"
+              :options="{...chartOptions, colors: ['#FB89F0'], title: {text: '照度'}}"
+              :series="luminocitySeries"
+               v-if="today.length > 0"
+            ></apexchart>
             <div v-else>加载中...</div>
           </ion-card-content>
         </ion-card>
@@ -73,7 +93,6 @@ import {
 } from '@ionic/vue';
 import { defineComponent, onMounted, computed, toRefs, reactive } from 'vue';
 import { getCurrent, getToday } from '@/api/index'
-import LineChart from '@/components/LineChart.vue'
 import { formatDate } from '@/utils/index'
 
 export default defineComponent({
@@ -86,14 +105,9 @@ export default defineComponent({
     IonToolbar,
     IonCard,
     IonCardContent,
-    IonButton,
-    LineChart
+    IonButton
   },
   setup() {
-    const defaultDataConfig = {
-      cubicInterpolationMode: 'monotone',
-      tension: 0.4
-    }
     const data: any = reactive({
       current: {},
       today: [],
@@ -103,74 +117,89 @@ export default defineComponent({
       }),
       timeLabels: computed(() => data.today.map((d: any) => d.tick)),
       chartOptions: {
-        radius: 0,
-        scales: {
-          y: {
-            display: true,
-            title: {
-              display: true,
-              text: 'Value'
+        stroke: {
+          curve: 'smooth',
+          width: 2
+        },
+        dataLabels: {
+          enabled: false
+        },
+        chart: {
+          height: 40,
+          type: 'area',
+          toolbar: {
+            show: false
+          },
+          animations: {
+            enabled: true,
+            easing: 'easeinout',
+            speed: 1500,
+            animateGradually: {
+                enabled: false,
+                delay: 100
             },
-            suggestedMin: -10,
-            suggestedMax: 200
+            dynamicAnimation: {
+                enabled: false,
+                speed: 150
+            }
           }
+        },
+        fill: {
+          type: "gradient",
+          gradient: {
+            shadeIntensity: 1,
+            opacityFrom: 0.7,
+            opacityTo: 0.9,
+            stops: [0, 90, 100]
+          }
+        },
+        xaxis: {
+          categories: computed(() => data.today.map((d: any) => d.tick)),
+          tickAmount: 10,
+        },
+        yaxis: {
+          decimalsInFloat: 1
+        },
+        annotations: {
+          xaxis: [
+            {
+              x: '00:00',
+              borderColor: '#CC0000'
+            }
+          ]
         }
       },
-      temperatureData: computed(() => {
+      temperatureSeries: computed(() => {
         const temperatures: any = data.today.map((d: any) => d.temperature)
-        return {
-          labels: data.timeLabels,
-          datasets: [
-            {
-              label: '温度',
-              backgroundColor: '#6CB33F',
-              data: temperatures,
-              ...defaultDataConfig
-            }
-          ]
-        }
+        return [{
+          name: '气温',
+          type: 'line',
+          data: temperatures
+        }]
       }),
-      humidityData: computed(() => {
-        const humidity: any = data.today.map((d: any) => d.humidity)
-        return {
-          labels: data.timeLabels,
-          datasets: [
-            {
-              label: '湿度',
-              backgroundColor: '#009DDC',
-              data: humidity,
-              ...defaultDataConfig
-            }
-          ]
-        }
+      humiditySeries: computed(() => {
+        const humidities: any = data.today.map((d: any) => d.humidity)
+        return [{
+          name: '气温',
+          type: 'line',
+          data: humidities
+        }]
       }),
-      pressureData: computed(() => {
-        const pressure: any = data.today.map((d: any) => d.pressure)
-        return {
-          labels: data.timeLabels,
-          datasets: [
-            {
-              label: '气压',
-              backgroundColor: '#FDBB30',
-              data: pressure,
-              ...defaultDataConfig
-            }
-          ]
-        }
+      pressureSeries: computed(() => {
+        const pressures: any = data.today.map((d: any) => d.pressure)
+        return [{
+          name: '气温',
+          type: 'line',
+          data: pressures
+        }]
       }),
-      luminocityData: computed(() => {
-        const luminocity: any = data.today.map((d: any) => d.luminocity)
-        return {
-          labels: data.timeLabels,
-          datasets: [
-            {
-              label: '照度',
-              backgroundColor: '#FB89F0',
-              data: luminocity,
-              ...defaultDataConfig
-            }
-          ]
-        }
+      luminocitySeries: computed(() => {
+        const luminocities: any = data.today.map((d: any) => d.luminocity)
+        return [{
+          name: '气温',
+          type: 'line',
+          data: luminocities
+        }]
       })
     })
 

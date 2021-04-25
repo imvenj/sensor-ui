@@ -8,11 +8,13 @@ export default defineComponent({
   props: {
     chartData: {
       type: Object,
-      required: true
+      required: true,
+      default: () => ({})
     },
     chartOptions: {
       type: Object,
-      required: false
+      required: false,
+      default: () => ({})
     }
   },
   methods: {
@@ -22,6 +24,7 @@ export default defineComponent({
    },
   watch: {
     chartData() {
+      console.log('render')
       this.reRender()
     },
     chartOptions() {
