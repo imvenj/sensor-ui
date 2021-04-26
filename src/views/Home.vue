@@ -28,7 +28,7 @@
                   <ion-icon :icon="cloudOutline"></ion-icon>{{ current.pressure || '...' }} hPa
                 </div>
                 <div class="info-panel-item altitude">
-                  <ion-icon :icon="airplaneOutline"></ion-icon>{{ current.altitude || '...' }} M
+                  <ion-icon :icon="airplaneOutline"></ion-icon>{{ current.pressure > 1013.25 && current.altitude > 0 ? '-' : '' }}{{ current.altitude || '...' }} M
                 </div>
                 <div class="info-panel-item luminocity">
                   <ion-icon :icon="bulbOutline"></ion-icon>{{ current.luminocity || '...' }} lux
