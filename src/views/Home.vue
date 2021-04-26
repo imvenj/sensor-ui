@@ -16,11 +16,25 @@
       <div id="container">
         <ion-card v-if="current">
           <ion-card-content>
-            <div>气温：{{ current.temperature || '...' }} ℃</div>
-            <div>湿度：{{ current.humidity || '...' }} %</div>
-            <div>气压：{{ current.pressure || '...' }} hPa</div>
-            <div>海拔：{{ current.pressure > 1013.25 && current.altitude > 0 ? '-' : '' }}{{ current.altitude || '...' }} M</div>
-            <div>照度：{{ current.luminocity || '...' }} lux</div>
+            <div class="info-panel">
+              <div class="info-panel-main" :style="temperatureColor">
+                <span id="temperature-value">{{ current.temperature || '...' }}</span><span id="temperature-unit"> ℃</span>
+              </div>
+              <div class="info-panel-misc">
+                <div class="info-panel-item humidity">
+                  <ion-icon :icon="waterOutline"></ion-icon>{{ current.humidity || '...' }} %
+                </div>
+                <div class="info-panel-item pressure">
+                  <ion-icon :icon="cloudOutline"></ion-icon>{{ current.pressure || '...' }} hPa
+                </div>
+                <div class="info-panel-item altitude">
+                  <ion-icon :icon="airplaneOutline"></ion-icon>{{ current.altitude || '...' }} M
+                </div>
+                <div class="info-panel-item luminocity">
+                  <ion-icon :icon="bulbOutline"></ion-icon>{{ current.luminocity || '...' }} lux
+                </div>
+              </div>
+            </div>
             <div class="updated-at">
               更新于：{{ currentDate }}
             </div>
@@ -94,6 +108,7 @@ import {
 import { defineComponent, onMounted, computed, toRefs, reactive } from 'vue';
 import { getCurrent, getToday } from '@/api/index'
 import { formatDate, startOfDate } from '@/utils/index'
+import { waterOutline, cloudOutline, airplaneOutline, bulbOutline } from 'ionicons/icons'
 
 export default defineComponent({
   name: 'Home',
@@ -177,6 +192,16 @@ export default defineComponent({
         if (!ts) { return '...' }
         const latest: Date = new Date(ts)
         return formatDate(latest)
+      }),
+      temperatureColor: computed(() => {
+        let color = '#6CB33F'
+        const t = data.current.temperature
+        if (t > 28) {
+          color = '#FF8377'
+        } else if (t < 18) {
+          color = '#1B87FF'
+        }
+        return { color }
       }),
       timeLabels: [],
       temperatureSeries: [],
@@ -283,10 +308,47 @@ export default defineComponent({
       }, 30000)
     })
 
-    return { ...toRefs(data), fetchToday }
+    return { ...toRefs(data), fetchToday, waterOutline, cloudOutline, airplaneOutline, bulbOutline }
   }
 });
 </script>
 
 <style scoped>
+.info-panel {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+}
+.info-panel .info-panel-main {
+  display: flex;
+  line-height: 1;
+  margin-right: 3%;
+}
+.info-panel .info-panel-main #temperature-value {
+  font-size: 3.5em;
+}
+.info-panel .info-panel-main #temperature-unit {
+  font-size: 1.5em;
+}
+.info-panel .info-panel-misc .info-panel-item.humidity {
+  color: #009DDC;
+}
+.info-panel .info-panel-misc .info-panel-item.pressure {
+  color: #FDBB30;
+}
+.info-panel .info-panel-misc .info-panel-item.altitude {
+  color: lightcoral;
+}
+.info-panel .info-panel-misc .info-panel-item.luminocity {
+  color: #FB89F0;
+}
+.updated-at {
+  font-size: 0.8em;
+  margin-top: 8px;
+  color: #ccc;
+}
+.info-panel ion-icon {
+  vertical-align: text-top;
+  margin-right: 5px;
+}
 </style>
