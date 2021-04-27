@@ -18,7 +18,7 @@
           <ion-card-content>
             <div class="info-panel">
               <div class="info-panel-main" :style="temperatureColor">
-                <span id="temperature-value">{{ current.temperature || '...' }}</span><span id="temperature-unit"> ℃</span>
+                <span id="temperature-value">{{ current.temperature === 0 ? current.temperature : (current.temperature || '...') }}</span><span id="temperature-unit"> ℃</span>
               </div>
               <div class="info-panel-misc">
                 <div class="info-panel-item humidity">
@@ -28,10 +28,10 @@
                   <ion-icon :icon="cloudOutline"></ion-icon>{{ current.pressure || '...' }} hPa
                 </div>
                 <div class="info-panel-item altitude">
-                  <ion-icon :icon="airplaneOutline"></ion-icon>{{ current.pressure > 1013.25 && current.altitude > 0 ? '-' : '' }}{{ current.altitude || '...' }} M
+                  <ion-icon :icon="airplaneOutline"></ion-icon>{{ current.pressure > 1013.25 && current.altitude > 0 ? '-' : '' }}{{ current.altitude === 0 ? current.altitude : (current.altitude || '...') }} M
                 </div>
                 <div class="info-panel-item luminocity">
-                  <ion-icon :icon="bulbOutline"></ion-icon>{{ current.luminocity || '...' }} lux
+                  <ion-icon :icon="bulbOutline"></ion-icon>{{ current.luminocity === 0 ? current.luminocity : (current.luminocity || '...') }} lux
                 </div>
               </div>
             </div>
