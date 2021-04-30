@@ -123,6 +123,7 @@ export default defineComponent({
     IonButton
   },
   setup() {
+    const isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
     const chartOptions = {
       stroke: {
         curve: 'smooth',
@@ -154,10 +155,11 @@ export default defineComponent({
       fill: {
         type: "gradient",
         gradient: {
+          shade: isDarkMode ? 'dark' : 'light',
           shadeIntensity: 1,
           opacityFrom: 0.7,
           opacityTo: 0.9,
-          stops: [0, 90, 100]
+          stops: [50, 90, 100]
         }
       },
       xaxis: {
@@ -183,6 +185,9 @@ export default defineComponent({
         x: {
           format: 'HH:mm'
         }
+      },
+      theme: {
+        mode: isDarkMode ? 'dark' : 'light'
       }
     }
     const data: any = reactive({

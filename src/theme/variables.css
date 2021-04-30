@@ -233,4 +233,8 @@ http://ionicframework.com/docs/theming/ */
 
     --ion-card-background: #1e1e1e;
   }
+
+  /* Apex Chart */
+
+  svg.apexcharts-svg { background: transparent !important; }
 }
