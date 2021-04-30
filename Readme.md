@@ -10,4 +10,4 @@ Schema: TBA
 
 ## Screenshot
 
-[screenshot](screenshot.jpg)
+![screenshot](screenshot.jpg)
