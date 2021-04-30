@@ -22,16 +22,20 @@
               </div>
               <div class="info-panel-misc">
                 <div class="info-panel-item humidity">
-                  <ion-icon :icon="waterOutline"></ion-icon>{{ current.humidity || '...' }} %
+                  <ion-icon :icon="waterOutline"></ion-icon>
+                  <span>{{ current.humidity || '...' }} %</span>
                 </div>
                 <div class="info-panel-item pressure">
-                  <ion-icon :icon="cloudOutline"></ion-icon>{{ current.pressure || '...' }} hPa
+                  <ion-icon :icon="cloudOutline"></ion-icon>
+                  <span>{{ current.pressure || '...' }} hPa</span>
                 </div>
                 <div class="info-panel-item altitude">
-                  <ion-icon :icon="airplaneOutline"></ion-icon>{{ current.pressure > 1013.25 && current.altitude > 0 ? '-' : '' }}{{ current.altitude === 0 ? current.altitude : (current.altitude || '...') }} M
+                  <ion-icon :icon="airplaneOutline"></ion-icon>
+                  <span>{{ current.pressure > 1013.25 && current.altitude > 0 ? '-' : '' }}{{ current.altitude === 0 ? current.altitude : (current.altitude || '...') }} M</span>
                 </div>
                 <div class="info-panel-item luminocity">
-                  <ion-icon :icon="bulbOutline"></ion-icon>{{ current.luminocity === 0 ? current.luminocity : (current.luminocity || '...') }} lux
+                  <ion-icon :icon="bulbOutline"></ion-icon>
+                  <span>{{ current.luminocity === 0 ? current.luminocity : (current.luminocity || '...') }} lux</span>
                 </div>
               </div>
             </div>
@@ -352,8 +356,13 @@ export default defineComponent({
   margin-top: 8px;
   color: #ccc;
 }
+.info-panel span {
+  vertical-align: middle;
+  display: inline-block;
+}
 .info-panel ion-icon {
-  vertical-align: text-top;
+  vertical-align: middle;
+  display: inline-block;
   margin-right: 5px;
 }
 </style>
