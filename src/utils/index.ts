@@ -20,5 +20,5 @@ export const formatDate = (aDate: Date, timeOnly = false, showSeconds = true) =>
 }
 
 export const startOfDate = (date: Date) => {
-  return new Date(date.getFullYear(), date.getMonth() + 1, date.getDate(), 0, 0, 0)
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0)
 }
