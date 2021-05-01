@@ -258,7 +258,7 @@ export default defineComponent({
           const tick = formatDate(new Date(t.timestamp), false)
           const parts = tick.split(/[-: ]/)
           const minute = Math.floor(Number(parts[4]) / 10) * 10
-          const averageTimestamp = new Date(Number(parts[0]), Number(parts[1]), Number(parts[2]), Number(parts[3]), minute, 0).valueOf()
+          const averageTimestamp = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]), Number(parts[3]), minute, 0).valueOf()
           const key = `${parts[3]}:${minute}`
           if (!currentKey || currentKey !== key) {
             currentKey = key
